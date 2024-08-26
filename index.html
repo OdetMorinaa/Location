@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Show Country</title>
+</head>
+<body>
+    <div class="container">
+        <h1>You're in:</h1>
+        <p id="country">Loading...</p>
+    </div>
+    <script>
+        // Replace 'YOUR_API_KEY' with your actual API key from a geocoding service
+const API_KEY = 'YOUR_API_KEY';
+const countryElement = document.getElementById('country');
+
+function getCountry(lat, lon) {
+    fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.sys && data.sys.country) {
+                countryElement.textContent = data.sys.country;
+            } else {
+                countryElement.textContent = 'Unable to determine country.';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching the country:', error);
+            countryElement.textContent = 'Error fetching country.';
+        });
+}
+
+function handleError(error) {
+    console.error('Geolocation error:', error);
+    countryElement.textContent = 'Unable to get location.';
+}
+
+function success(position) {
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+    getCountry(latitude, longitude);
+}
+
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(success, handleError);
+} else {
+    countryElement.textContent = 'Geolocation is not supported by this browser.';
+}
+
+    </script>
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+}
+
+.container {
+    text-align: center;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+p {
+    font-size: 20px;
+    color: #333;
+}
+
+</style>
+</body>
+</html>
